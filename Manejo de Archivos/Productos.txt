@@ -1,0 +1,6 @@
+lapicera,120.5,30
+tupper,400.5,80
+mesa,500.7,40
+llaves,20.0,90
+botella,900.0,30
+guitarra,4000.99,3
