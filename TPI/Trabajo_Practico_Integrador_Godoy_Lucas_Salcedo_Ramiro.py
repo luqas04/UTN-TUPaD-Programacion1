@@ -1,14 +1,26 @@
 import csv
+import os
+
 from funciones_opciones import menu, buscar_pais, filtrar_paises, ordenar_paises, mostrar_estadisticas
+
+def inicializar_archivo():
+    if not os.path.exists("paises.csv"):
+        with open("paises.csv", "w", newline='', encoding='utf-8-sig') as archivo:
+            escritor = csv.writer(archivo)
+            escritor.writerow(["nombre", "continente", "poblacion", "superficie"])
 
 def leer_csv(ruta):
     paises = []
-    with open(ruta, newline='', encoding='utf-8-sig') as archivo:
-        lector = csv.DictReader(archivo)
+    with open(ruta, "r", newline='', encoding='utf-8-sig') as archivo:
+        lector = csv.DictReader(archivo, fieldnames=["nombre", "continente", "poblacion", "superficie"])
+        next(lector)  # Saltar la fila de encabezado
         for fila in lector:
-            fila["poblacion"] = int(fila["poblacion"])
-            fila["superficie"] = int(fila["superficie"])
-            paises.append(fila)
+            try:
+                fila["poblacion"] = int(fila["poblacion"])
+                fila["superficie"] = int(fila["superficie"])
+                paises.append(fila)
+            except ValueError:
+                print(f"Error al convertir datos del país: {fila['nombre']}. Se omite este registro.")
     return paises
 
 
@@ -31,4 +43,5 @@ def main():
         else:
             print("Opción inválida. Intentá de nuevo.")
 
+inicializar_archivo()
 main()
