@@ -12,8 +12,7 @@ def inicializar_archivo():
 def leer_csv(ruta):
     paises = []
     with open(ruta, "r", newline='', encoding='utf-8-sig') as archivo:
-        lector = csv.DictReader(archivo, fieldnames=["nombre", "continente", "poblacion", "superficie"])
-        next(lector)  # Saltar la fila de encabezado
+        lector = csv.DictReader(archivo)
         for fila in lector:
             try:
                 fila["poblacion"] = int(fila["poblacion"])

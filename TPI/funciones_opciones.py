@@ -1,11 +1,16 @@
 def menu():
-    print("\n--- Gestión de Datos de Países ---")
-    print("1. Buscar país")
-    print("2. Filtrar países")
-    print("3. Ordenar países")
-    print("4. Mostrar estadísticas")
-    print("5. Salir")
-    return input("Elegí una opción: ")
+    print("\n" + "=" * 40)
+    print("         GESTIÓN DE PAÍSES")
+    print("=" * 40)
+    print(" [1] Buscar país")
+    print(" [2] Filtrar países")
+    print(" [3] Ordenar países")
+    print(" [4] Mostrar estadísticas")
+    print(" [5] Salir")
+    print("-" * 40)
+    opcion = input("Elegí una opción -->: ").strip()
+
+    return opcion
 
 
 def buscar_pais(paises):
@@ -27,14 +32,10 @@ def filtrar_paises(paises):
     
     continente = input("Ingresá el continente para filtrar: ")
     
-    # Creamos una lista vacía para ir guardando los países que cumplen la condición
-    paises_filtrados = []
-    
-    # Recorremos la lista de países
-    for pais in paises:
-        # Comparamos el continente en minúsculas para que no importe mayúsculas/minúsculas
-        if pais["continente"].lower() == continente.lower():
-            paises_filtrados.append(pais)
+ # Filtramos los países por continente
+ 
+    paises_filtrados = [p for p in paises if p["continente"].lower() == continente.lower()]
+
     
     # Mostramos los resultados
     if paises_filtrados:
@@ -53,28 +54,34 @@ def ordenar_paises(paises):
         print("No hay datos disponibles.")
         return
      
-    # Pide al usuario el criterio
     criterio = input("Ingresá el criterio de ordenamiento (nombre, poblacion, superficie): ").lower()
-    
-    # Validamos que el criterio sea correcto
+
     if criterio not in ["nombre", "poblacion", "superficie"]:
         print("Criterio inválido. Usando 'nombre' por defecto.")
         criterio = "nombre"
-    
-    # Preguntamos de que manera quiere ordenar (ascendente o descendente)
+
     while True:
         respuesta = input("¿Querés orden descendente? (s/n): ").strip().lower()
-        # Validamos la respuesta
         if respuesta in ["s", "n"]:
-            orden_desc = respuesta == "s"  # True si es 's', False si es 'n'
-            break  # Salimos del bucle cuando la respuesta es válida
-        else:
-             print("Respuesta inválida. Por favor, escribí 's' o 'n'.")
+            orden_desc = respuesta == "s"
+            break
+        print("Respuesta inválida. Escribí 's' o 'n'.")
 
-    # Ordenamos la lista
+    try:
+        paises_ordenados = sorted(paises, key=lambda x: x[criterio], reverse=orden_desc)
+    except KeyError:
+        print(f"Faltan datos en algunos países para ordenar por {criterio}.")
+        return
+    except TypeError:
+        print(f"Los datos del criterio '{criterio}' no son consistentes (ej: texto mezclado con números).")
+        return
+
+    print(f"\nPaíses ordenados por {criterio} ({'descendente' if orden_desc else 'ascendente'}):")
+
+    # Ordenar la lista
     paises_ordenados = sorted(paises, key=lambda x: x[criterio], reverse=orden_desc)
     
-    # Mostramos solo los nombres y el valor del criterio para que sea más legible
+    # Mostrar los resultados
     print(f"\nPaíses ordenados por {criterio} ({'descendente' if orden_desc else 'ascendente'}):")
     
     if criterio in ["poblacion", "superficie"]:
@@ -84,11 +91,14 @@ def ordenar_paises(paises):
         for p in paises_ordenados:
             print(f"{p[criterio]}")
 
+
 def mostrar_estadisticas(paises):
+
     if not paises:
         print("No hay datos disponibles.")
         return
     
+    # Cálculo de estadísticas
     mayor_poblacion = max(paises, key=lambda x: x["poblacion"])
     menor_poblacion = min(paises, key=lambda x: x["poblacion"])
 
@@ -97,16 +107,31 @@ def mostrar_estadisticas(paises):
 
     total_superficie = sum(pais["superficie"] for pais in paises)
     promedio_superficie = total_superficie / len(paises)
-
+    
+    # Conteo de países por continente  
     paises_por_continente = {}
     for p in paises:
         continente = p["continente"]
         paises_por_continente[continente] = paises_por_continente.get(continente, 0) + 1
 
-    print(f"País con mayor población: {mayor_poblacion}")
-    print(f"País con menor población: {menor_poblacion}")
-    print(f"Población promedio: {promedio_poblacion}")
-    print(f"Superficie promedio: {promedio_superficie}")
-    print("Cantidad de países por continente:")
+    print("\n" + "=" * 45)
+    print("               ESTADÍSTICAS")
+    print("=" * 45)
+
+    print(f"\nPaís con mayor población:")
+    print(f"  • Nombre: {mayor_poblacion['nombre']}")
+    print(f"  • Población: {mayor_poblacion['poblacion']:,}".replace(",", "."))
+
+    print(f"\nPaís con menor población:")
+    print(f"  • Nombre: {menor_poblacion['nombre']}")
+    print(f"  • Población: {menor_poblacion['poblacion']:,}".replace(",", "."))
+
+    print("\nPromedios generales:")
+    print(f"  • Población promedio: {promedio_poblacion:,.2f}".replace(",", "."))
+    print(f"  • Superficie promedio: {promedio_superficie:,.2f} km²".replace(",", "."))
+
+    print("\nCantidad de países por continente:")
+    print("-" * 45)
     for continente, cantidad in paises_por_continente.items():
-        print(f"{continente}: {cantidad}")
+        print(f"  {continente:<15} → {cantidad}")
+    print("-" * 45)
